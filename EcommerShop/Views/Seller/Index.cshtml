@@ -1,0 +1,127 @@
+﻿@model EcommerShop.Models.ModelViews.Seller.IndexModelView
+@{
+    ViewData["Title"] = "Index";
+    Layout = "";
+}
+
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link type="text/css" rel="stylesheet" href="~/vendor/template/css/bootstrap.min.css" />
+
+
+
+    <!-- Font Awesome Icon -->
+    <link rel="stylesheet" href="~/vendor/template/css/font-awesome.min.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    <style>
+        .w-100 {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="row px-2 py-2">
+        <div style="text-align:right">
+            <span>Bạn đã có shop?</span>
+            <a style="padding-right:2rem;" asp-controller="Identity/Account" asp-action="Login" class="danger">Đăng nhập</a>
+        </div>
+    </div>
+    <div class="row" style="color:red">
+        <div class="mw-90" style="margin:auto; height:15vh; text-align:center">
+            <h1>BÁN HÀNG CÙNG E-SHOP</h1>
+            <h3>Đơn giản - Tiện lợi - Chuyên nghiệp</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container" style="padding:2rem">
+            <div class="col-lg-6"></div>
+            <div class="col-lg-6">
+                <form asp-action="Index" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="FullName">Họ và tên chủ cửa hàng:</label>
+                        <br>
+                        <input class="form-control w-100" asp-for="FullName" />
+                        <br>
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber">
+                            Số điện thoại chủ cửa hàng
+                        </label>
+                        <br>
+                        <input class="form-control w-100" asp-for="PhoneNumber" />
+                        <br>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email">
+                            Địa chỉ email của chủ cửa hàng
+                        </label>
+                        <br>
+                        <input class="form-control w-100" asp-for="Email" />
+                        <br>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Password">
+                            Mật khẩu
+                        </label>
+                        <br>
+                        <input class="form-control w-100" asp-for="Password" />
+                        <br>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ShopName">
+                            Tên cửa hàng
+                        </label>
+                        <br>
+                        <input class="form-control w-100" asp-for="ShopName" />
+                        <br>
+                        <span asp-validation-for="ShopName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TradingCode">Mã số đăng ký kinh doanh</label>
+                        <br>
+                        <input class="form-control w-100" asp-for="TradingCode" />
+                        <br>
+                        <span asp-validation-for="TradingCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Address">Địa chỉ đầy đủ của cửa hàng</label>
+                        <br>
+                        <input class="form-control w-100" asp-for="Address" />
+                        <br>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary" type="submit">Đăng ký bán hàng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

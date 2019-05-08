@@ -1,0 +1,373 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "";
+}
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/vendor/kendoui/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="~/vendor/kendoui/styles/kendo.default.min.css" />
+    <link rel="stylesheet" href="~/vendor/kendoui/styles/kendo.default.mobile.min.css" />
+
+    <script src="~/vendor/kendoui/js/jquery.min.js"></script>
+    <script src="~/vendor/kendoui/js/kendo.all.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link type="text/css" rel="stylesheet" href="~/vendor/template/css/bootstrap.min.css" />
+
+
+
+    <!-- Font Awesome Icon -->
+    <link rel="stylesheet" href="~/vendor/template/css/font-awesome.min.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    <style>
+        .w-100 {
+            max-width: 100%;
+        }
+
+        .w-90 {
+            max-width: 90%;
+        }
+
+        .margin-center {
+            margin: 0 auto;
+        }
+
+        .pd-a-1rem {
+            padding: 1rem;
+        }
+
+        .pd-a-05rem {
+            padding: .5rem;
+        }
+
+        .bordered {
+            border: 1px solid;
+            background-color: seashell;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="row">
+        <div class="row">
+            <div class="container text-right">
+                <button onclick="openCreateNewWindow(event)" type="button" class="btn btn-success" style="margin:2rem 0rem;">+ Thêm mới danh mục</button>
+            </div>
+        </div>
+        <div class="container">
+            <div id="grid"></div>
+        </div>
+        <div id="createNewWnd">
+        </div>
+        <div id="detailWnd">
+        </div>
+        <div id="editWnd">
+        </div>
+    </div>
+    <script>
+    let createNewWnd, detailWnd, editWnd, createNewTemplate, detailTemplate, editWndTemplate;
+    const dataSource = new kendo.data.DataSource( {
+        type: "jsonp",
+        transport: {
+            read: "/Category/All"
+        },
+        pageSize: 5,
+        schema: {
+            model: {
+                fields: {
+                    id: { type: "number" },
+                    name: { type: "string" }
+                }
+            }
+        },
+    })
+        $(document).ready(function () {
+            $("#grid").kendoGrid({
+
+                dataSource: dataSource,
+                pageable: true,
+                filterable: {
+                    mode: "row"
+                },
+
+                columns: [{
+                    field: "id",
+                    title: "Id",
+                    filterable: {
+                        cell: {
+                            showOperators: false
+                        }
+                    }
+                }, {
+                    field: "name",
+                    title: "Tên danh mục",
+                    filterable: {
+                        cell: {
+                            operator: "contains",
+                            suggestionOperator: "contains",
+                            showOperators: false
+                        }
+                    }
+                },
+                {
+                    command: [
+                        { iconClass: "fa fa-info", className: "btn btn-info", name: "showDetails", click: showDetails, text: "" },
+                        { iconClass: "fa fa-pencil", className: "btn", name: "editDetails", click: editDetails, text: "" },
+                        { iconClass: "fa fa-trash", className: "btn", name: "deleteAttributeSet", click: deleteAttributeSet, text: "" }
+                    ]
+
+                }
+                ]
+            })
+            createNewWnd = $("#createNewWnd").kendoWindow({
+                title: "Thêm mới danh mục",
+                modal: true,
+                visible: false,
+                resizable: true,
+                width: 500,
+                maxHeight: 600,
+                actions: ["Minimize", "Maximize", "Close"]
+
+            }).data("kendoWindow")
+            detailWnd = $("#detailWnd").kendoWindow({
+                title: "Chi tiết danh mục",
+                modal: true,
+                visible: false,
+                resizable: true,
+                width: 500,
+                maxHeight: 600,
+                actions: ["Minimize", "Maximize", "Close"]
+
+            }).data("kendoWindow")
+            editWnd = $("#editWnd").kendoWindow({
+                title: "Chỉnh sửa danh mục",
+                modal: true,
+                visible: false,
+                resizable: true,
+                width: 500,
+                maxHeight: 600,
+                actions: ["Minimize", "Maximize", "Close"]
+
+            }).data("kendoWindow")
+
+            createNewTemplate = kendo.template($("#createNewTemplate").html())
+            detailTemplate = kendo.template($("#detailTemplate").html())
+            editTemplate = kendo.template($("#editTemplate").html())
+        })
+
+        function showDetails(e) {
+            e.preventDefault()
+            let clickedRowData = this.dataItem($(e.currentTarget).closest("tr"));
+            $.ajax({
+                url: `/Category/Detail?id=${clickedRowData.id}`,
+                type: "get",
+                success: function (response) {
+                    if (response.httpStatus = 200) {
+                        entireAttributeSet = response.data;
+                        detailWnd.content(detailTemplate(response.data))
+                        detailWnd.center().open()
+                    }
+                }
+            })
+        }
+        function editDetails(e) {
+            e.preventDefault()
+        }
+        function deleteAttributeSet(e) {
+            e.preventDefault()
+            let clickedRowData = this.dataItem($(e.currentTarget).closest("tr"));
+            $.ajax({
+                url: `/Category/Delete?id=${clickedRowData.id}`,
+                type: "post",
+                contentType: "application/json",
+                data: { id: clickedRowData.id },
+                success: function (response) {
+                    if (response.httpStatus == 200) {
+                       dataSource.remove(clickedRowData)
+                    }
+                     kendo.alert(response.msg)
+                }
+            })
+
+        }
+        function openCreateNewWindow(e) {
+            e.preventDefault()
+            createNewWnd.content(createNewTemplate)
+            createNewWnd.center().open()
+        }
+    </script>
+    <script type="text/x-kendo-template" id="createNewTemplate">
+        <div>
+
+            <div class="text-center form-group w-90 margin-center">
+                <label>Tên danh mục</label>
+                <input class="form-control" id="inputAttributeSetName" />
+            </div>
+
+            <div id="inputAttributeContainer" class="pd-a-1rem">
+                <div class="pd-a-1rem bordered attribute-input">
+                    <div class="form-group w-90">
+                        <label>Mã thuộc tính</label>
+                        <br />
+                        <input class="form-control" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Tên thuộc tính</label>
+                        <br />
+                        <input class="form-control" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Bắt buộc tồn tại</label>
+                        <input type="checkbox" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Thuộc tính đặc trưng</label>
+                        <input type="checkbox" />
+                    </div>
+                </div>
+            </div>
+            <div class="row pd-a-1rem">
+                <h3 id="msgDisplayer"></h3>
+            </div>
+            <div class="row text-right" style="margin:1rem;">
+                <button onclick="addNewAttribute(event)" class="btn">Thêm thuộc tính</button>
+                <button id="sendingCreateAttributeSetBtn" onclick="submitNewAttributeSet(event)" class="btn btn-success">Hoàn thành</button>
+            </div>
+        </div>
+    </script>
+    <script type="text/x-kendo-template" id="editTemplate">
+        <div>
+
+        </div>
+    </script>
+    <script type="text/x-kendo-template" id="detailTemplate">
+        <div>
+            <div class="text-center form-group w-90 margin-center">
+                <label>Tên danh mục</label>
+                <h3>#=name#</h3>
+                <br />
+                #for(let i = 0; i < data.jointAttributeSet.length ; i++){#
+                <div class="pd-a-1rem bordered attribute-input">
+                    <div class="form-group w-90">
+                        <label>Mã thuộc tính</label>
+                        <br />
+                        <input disabled value="#=data.jointAttributeSet[i].attribute.code#" class="form-control" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Tên thuộc tính</label>
+                        <br />
+                        <input disabled value="#=data.jointAttributeSet[i].attribute.name#"  class="form-control" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Bắt buộc tồn tại</label>
+                        <input disabled #if(data.jointAttributeSet[i].attribute.isRequired)# checked type="checkbox" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Thuộc tính đặc trưng</label>
+                        <input disabled #if(data.jointAttributeSet[i].attribute.isHighlighted)# checked type="checkbox" />
+                    </div>
+                </div>
+                <br />
+                #}#
+            </div>
+        </div>
+    </script>
+    <script>
+        let inputAttributeContainer, sendingCreateAttributeSetBtn;
+
+        function removeElement(id) {
+            $("#inputAttributeContainer").children(`#${id}`).remove()
+        }
+        function addNewAttribute(e) {
+            let genratedId = ''.concat(Date.now()).concat('_').concat(Math.round(Math.random() * 7));
+            inputAttributeContainer = $("#inputAttributeContainer")
+            var newAttributeInputRow = `
+                <div id='${genratedId}'class="pd-a-1rem bordered attribute-input">
+                    <div class="form-group text-right">
+                        <button class="btn btn-danger" onclick="removeElement('${genratedId}')" type="button">x</button>
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Mã thuộc tính</label>
+                        <br />
+                        <input class="form-control" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Tên thuộc tính</label>
+                        <br />
+                        <input class="form-control" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Bắt buộc tồn tại</label>
+                        <input type="checkbox" />
+                    </div>
+                    <div class="form-group w-90">
+                        <label>Thuộc tính đặc trưng</label>
+                        <input type="checkbox" />
+                    </div>
+                </div>`
+            inputAttributeContainer.append("<br/>")
+            inputAttributeContainer.append(newAttributeInputRow)
+        }
+
+        function submitNewAttributeSet(e, button) {
+            let formData = {
+                Name: document.querySelector("#inputAttributeSetName").value,
+                Attributes: []
+            }
+            if (sendingCreateAttributeSetBtn == null)
+                sendingCreateAttributeSetBtn = document.querySelector("#sendingCreateAttributeSetBtn")
+            sendingCreateAttributeSetBtn.disabled = true;
+
+            let attributeInputContainer = $("#inputAttributeContainer > .attribute-input")
+            for (let i = 0; i < attributeInputContainer.length; i++) {
+                let attributeInputs = attributeInputContainer.get(i).querySelectorAll("div > input")
+                let attribute = {
+                    Code: attributeInputs[0].value,
+                    Name: attributeInputs[1].value,
+                    IsRequired: attributeInputs[2].checked,
+                    IsHighlighted: attributeInputs[3].checked
+                }
+                formData.Attributes.push(attribute)
+            }
+            $.ajax({
+                url: "/Category/Add",
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    sendingCreateAttributeSetBtn.disabled = false;
+                    let msDisplayer = document.getElementById("msgDisplayer")
+                    if (response.statusCode == 200) {
+                        msDisplayer.className = "text-success"
+                        document.querySelector("#inputAttributeSetName").value = ""
+                        setTimeout(() => { document.location.reload(); }, 2000);
+                    }
+                    if (response.statusCode > 200) {
+                        msDisplayer.className = "text-danger"
+                    }
+                    msDisplayer.innerHTML = response.msg;
+                }
+            })
+        }
+    </script>
+
+</body>
+</html>
